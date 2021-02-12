@@ -15,7 +15,7 @@ use Twitter::API;
 
 sub new
 {
-	my ($class, $twitter_auth_params) = @_;
+	my ($class) = @_;
 
 	return bless {
 		twitter => $self->initialise_twitter($twitter_auth_params),
@@ -48,14 +48,16 @@ sub _load_next_page
 
 sub _initialise_twitter
 {
-	my ($self, $twitter_auth_params) = @_;
+	my ($self) = @_;
+
+	my $cfg = TweetPics::Config->new();
 
 	my $client = Twitter::API->new_with_traits(
 		traits              => 'Enchilada',
-		consumer_key        => $twitter_auth_params->{consumer_key},
-		consumer_secret     => $twitter_auth_params->{consumer_secret},
-		access_token        => $twitter_auth_params->{access_token},
-		access_token_secret => $twitter_auth_params->{access_token_secret}
+		consumer_key        => $cfg->value('secrets','twitter','consumer_key'),
+		consumer_secret     => $cfg->value('secrets','twitter','consumer_secret'),
+		access_token        => $cfg->value('secrets','twitter','access_token'),
+		access_token_secret => $cfg->value('secrets','twitter','access_token_secret')
 	);
 
 	return $client;
