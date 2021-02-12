@@ -17,11 +17,15 @@ sub new
 {
 	my ($class) = @_;
 
-	return bless {
-		twitter => $self->initialise_twitter($twitter_auth_params),
+	my $self = bless {
+		twitter => undef,
 		tweets => [],
 		twitter_params => undef
 	}, $class;
+
+	$self->{twitter} = $self->_initialise_twitter();
+
+	return $self;
 }
 
 sub next_post
@@ -40,9 +44,9 @@ sub next_post
 
 sub _load_next_page
 {
+	my ($self) = @_;
+
 	
-
-
 
 }
 
