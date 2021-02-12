@@ -119,20 +119,22 @@ sub _next_tweet
 
 	my $tweet = shift @{$self->{tweets}};
 
+	return $tweet;
 }
 
 sub _tweet_is_interesting
 {
 	my ($self, $tweet) = @_;
 
+	#not interesting if it's a retweet
 	return 0 if $tweet->{retweeted_status};
-	return 0 unless $tweet->{entities}->{media};
 
+	#not interesting if it doesan't have at least one photo
+	return 0 unless $tweet->{entities}->{media};
 	foreach my $media (@{$tweet->{entities}->{media}})
 	{
 		return 1 if $media->{type} eq 'photo';
 	}
-
 	return 0;
 }
 
