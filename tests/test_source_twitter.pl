@@ -24,4 +24,18 @@ my $source = TweetPics::Source::Twitter->new();
 isa_ok($source, 'TweetPics::Source::Twitter', 'Created Twitter Source');
 isa_ok($source->{twitter}, 'Twitter::API', 'Connected to Twitter');
 
+my $post = $source->next_post();
+my $post2 = $source->next_post();
+
+isa_ok($post, 'TweetPics::Post');
+isa_ok($post2, 'TweetPics::Post');
+
+my $msg1 = $post->get_message();
+my $msg2 = $post2->get_message();
+
+isnt($msg1, undef, 'post has message');
+isnt($msg2, undef, 'post has message');
+isnt($msg1, $msg2, 'two messages are different');
+
+
 done_testing();
