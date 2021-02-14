@@ -16,7 +16,7 @@ sub download_from_url
 		sleep(5); #wait and retry
 	}
 
-	die "Couldn't download image at $url\n";
+	die "Couldn't download $url\n";
 }
 
 
