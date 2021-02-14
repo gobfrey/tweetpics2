@@ -53,5 +53,43 @@ sub read_from_file
 	return $data;
 }
 
+sub directories_in_directory
+{
+	my ($dir) = @_;
+
+	die "Attempt to list non-directory\n" unless -d $dir;
+
+	opendir(DIR, $dir) or die $!;
+
+	my $dirs = [];
+	while (my $file = readdir(DIR)) {
+        	next if ($file =~ m/^\./);
+		next unless -d $dir.$file;
+		push @{$dirs}, $file;
+	}
+	closedir(DIR);
+
+	return $dirs;
+}
+
+sub files_in_directory
+{
+	my ($dir) = @_;
+
+	die "Attempt to list non-directory\n" unless -d $dir;
+
+	opendir(DIR, $dir) or die $!;
+
+	my $files = [];
+	while (my $file = readdir(DIR)) {
+        	next if ($file =~ m/^\./);
+		next unless -f $dir.$file;
+		push @{$files}, $file;
+	}
+	closedir(DIR);
+
+	return $files;
+}
+
 1;
 
