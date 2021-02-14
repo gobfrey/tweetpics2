@@ -42,10 +42,23 @@ sub _create_post_from_tweet
 {
 	my ($self, $tweet) = @_;
 
-	my $post = TweetPics::Post->new();
-	$post->set_message($tweet->{text});
-	$post->set_source_data($tweet);
-	$post->set_datestamp($tweet->{created_at});
+	my $images = $self->_create_images_from_tweet($tweet);
+
+	my $data = {
+		message => $tweet->{text},
+		images => $images,
+		source_name => 'twitter',
+		source_id => $tweet->{id}
+	};
+
+	my $post = TweetPics::Post->new($data);
+
+	return $post;
+}
+
+sub _create_images_from_tweet
+{
+	my ($self, $tweet) = @_;
 
 	my $images = [];
 	if (
@@ -56,39 +69,11 @@ sub _create_post_from_tweet
 		foreach my $media (@{$tweet->{extended_entities}->{media}})
 		{
 			next unless $media->{type} eq 'photo';
-			push @{$images}, $self->_create_image_from_tweet_media($media);
+			push @{$images}, TweetPics::Image->new_from_url($media->{media_url});
 		}
 	}
 
-	$post->set_images($images);
-
-	return $post;
-}
-
-sub _create_image_from_tweet_media
-{
-	my ($self, $tweet_media) = @_;
-
-	my $image = TweetPics::Image->new();
-
-	$image->set_source_url($tweet_media->{media_url});
-	$image->set_data($self->_get_image_data($tweet_media->{media_url}));
-
-	return $image;
-}
-
-sub _get_image_data
-{
-	my ($self, $url) = @_;
-
-	foreach (1..3)
-	{
-		my $image_data = get($url);
-		return $image_data if $image_data;
-		sleep(5); #wait and retry
-	}
-
-	die "Couldn't download image at $url\n";
+	return $images;
 }
 
 sub _next_interesting_tweet
@@ -143,7 +128,7 @@ sub _load_next_page
 	my ($self) = @_;
 
 	my $params = {
-		screen_name => 'gobfrey',
+		screen_name => 'gobfrey', #move to config
 		count => 200,
 		exclude_replies => 'true',
 		include_rts => 'false',

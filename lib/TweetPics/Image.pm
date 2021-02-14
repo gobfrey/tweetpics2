@@ -3,68 +3,44 @@ package TweetPics::Image;
 use strict;
 use warnings;
 
+use TweetPics::Utils;
+use LWP::Simple;
+
 sub new
 {
-	my ($class) = @_;
+	my ($class, $data) = @_;
 
-	my $self = bless
+	my $self = bless {}, $class;
+	
+	foreach my $fieldname (
+		'filename', #a filename to use when writing somewhere
+		'data' #the binary of the image
+	)
 	{
-		source_url => undef,
-		source_filename => undef,
-		type => undef,
-		data => undef
-	}, $class;
+		$self->{$fieldname} = $data->{$fieldname};
+	}
 
 	return $self;
 }
 
-sub set_source_url
+sub new_from_url
 {
-	my ($self,$value) = @_;
+	my ($class, $url) = @_;
 
-	$self->{source_url} = $value;
+	my $data =
+	{
+		'filename' => TweetPics::Utils::url_filename($url),
+		'data' => TweetPics::Utils::download_from_url($url)
+	};
+
+	return $class->new($data);
 }
 
-sub get_source_url
+sub get_filename
 {
 	my ($self) = @_;
 
-	return $self->{source_url};
-}
-
-sub set_source_filename
-{
-	my ($self,$value) = @_;
-
-	$self->{source_filename} = $value;
-}
-
-sub get_source_filename
-{
-	my ($self) = @_;
-
-	return $self->{source_filename};
-}
-
-sub set_type
-{
-	my ($self,$value) = @_;
-
-	$self->{type} = $value;
-}
-
-sub get_type
-{
-	my ($self) = @_;
-
-	return $self->{type};
-}
-
-sub set_data
-{
-	my ($self,$value) = @_;
-
-	$self->{data} = $value;
+	return $self->{filename};
 }
 
 sub get_data

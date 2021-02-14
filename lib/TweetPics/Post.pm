@@ -3,36 +3,24 @@ package TweetPics::Post;
 use strict;
 use warnings;
 
-sub value_names
-{
-	return qw/
-		message
-		datestamp
-		source_data
-		images
-	/;
-}	
-
 sub new
 {
-	my ($class) = @_;
+	my ($class, $data) = @_;
 
-	my $self = bless
+	my $self = bless {}, $class;
+
+	foreach my $fieldname (
+		'message', #the text associated with this pos
+		'datestamp', #when it was posted
+		'images', #images arrayref
+		'source_name', #e.g. twitter
+		'source_id' #id on the source platform
+	)
 	{
-		message => undef,
-		datestamp => undef,
-		source_data => undef,
-		images => undef
-	}, $class;
+		$self->{$fieldname} = $data->{$fieldname};
+	}
 
 	return $self;
-}
-
-sub set_message
-{
-	my ($self,$value) = @_;
-
-	$self->{message} = $value;
 }
 
 sub get_message
@@ -42,39 +30,11 @@ sub get_message
 	return $self->{message};
 }
 
-sub set_datestamp
-{
-	my ($self,$value) = @_;
-
-	$self->{datestamp} = $value;
-}
-
 sub get_datestamp
 {
 	my ($self) = @_;
 
 	return $self->{datestamp};
-}
-
-sub set_source_data
-{
-	my ($self,$value) = @_;
-
-	$self->{source_data} = $value;
-}
-
-sub get_source_data
-{
-	my ($self) = @_;
-
-	return $self->{source_data};
-}
-
-sub set_images
-{
-	my ($self,$value) = @_;
-
-	$self->{images} = $value;
 }
 
 sub get_images
@@ -84,5 +44,18 @@ sub get_images
 	return $self->{images};
 }
 
+sub get_source_name
+{
+	my ($self) = @_;
+
+	return $self->{source_name};
+}
+
+sub get_source_id
+{
+	my ($self) = @_;
+
+	return $self->{source_id};
+}
 
 1;
