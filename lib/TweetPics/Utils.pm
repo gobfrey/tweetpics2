@@ -33,7 +33,25 @@ sub url_filename
 	return $filename;
 }
 
+sub write_to_file
+{
+	my ($filepath, $data) = @_;
 
+	open my $fh, ">", $filepath or die "Couldn't open $filepath for writing\n";
+	print $fh $data;
+	close $fh;
+}
+
+sub read_from_file
+{
+	my ($filepath) = @_;
+
+	open my $fh, "<", $filepath or die "Couldn't open $filepath for reading\n";
+	my $data = do { local $/; <$fh> };
+	close $fh;
+
+	return $data;
+}
 
 1;
 
