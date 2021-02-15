@@ -8,6 +8,8 @@ sub new
 {
 	my ($class, $source, $persistence) = @_;
 
+	die "Updater missing source or persistence\n" unless $source && $persistence;
+
 	return bless {
 		source => $source,
 		persistence => $persistence
