@@ -33,7 +33,9 @@ my $data = {
 
 my $post = TweetPics::Post->new($data);
 
+ok(!$persistence->post_exists($post), 'Post does not exist in persistence');;
 $persistence->write_post($post);
+ok($persistence->post_exists($post), 'Post exists in persistence');;
 
 ok(-e "$base_path/twitter/12345/data.json", 'data.json exists at correct path');
 

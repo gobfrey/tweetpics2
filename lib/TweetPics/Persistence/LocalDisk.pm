@@ -26,22 +26,21 @@ sub new
 	}, $class;
 }
 
-sub post_base_path
+sub post_exists
 {
 	my ($self, $post) = @_;
 
-	my $path = $self->{base_path};
-	$path .= $post->get_source_name . '/';
-	$path .= $post->get_source_id . '/';
+	my $path = $self->_post_base_path($post);
 
-	return $path;
+	return 1 if -e $path . 'data.json';
+	return 0;
 }
 
 sub write_post
 {
 	my ($self, $post) = @_;
 
-	my $path = $self->post_base_path($post);
+	my $path = $self->_post_base_path($post);
 	make_path($path) unless -d $path;
 
 	my $data = {
@@ -64,6 +63,18 @@ sub write_post
 		$self->_write_image($image_path, $images->[$i]);
 	}
 }
+
+sub _post_base_path
+{
+	my ($self, $post) = @_;
+
+	my $path = $self->{base_path};
+	$path .= $post->get_source_name . '/';
+	$path .= $post->get_source_id . '/';
+
+	return $path;
+}
+
 
 sub _write_image
 {
