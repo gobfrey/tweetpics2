@@ -47,6 +47,7 @@ sub _create_post_from_tweet
 	my $data = {
 		message => $tweet->{text},
 		images => $images,
+		datestamp => $tweet->{created_at}, 
 		source_name => 'twitter',
 		source_id => $tweet->{id}
 	};
