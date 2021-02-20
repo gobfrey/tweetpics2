@@ -79,12 +79,6 @@ sub write_post
 {
 	my ($self, $post) = @_;
 
-	my $prev_filename = undef;
-	if ($self->{index_number} > 1)
-	{
-		$prev_filename = $self->{base_path} . $self->_previous_index_filename;
-	}
-
 	#write the last page and move onto the next
 	if (scalar @{$self->{current_images}} >= $self->{images_per_index})
 	{
@@ -98,7 +92,7 @@ sub write_post
 
 	push @{$self->{current_images}}, @{$image_data};
 
-	$self->_build_index(undef, $prev_filename);
+	$self->_build_index(0);
 }
 
 sub post_exists
