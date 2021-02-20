@@ -1,0 +1,40 @@
+[% WRAPPER page.tt %]
+
+<div class="container">
+<div class="grid" >
+[% FOREACH image IN image_data %]
+<div class="grid-item [% IF image.is_wide %] grid-item--width2 [% END %]">
+<a title="[% image.post_message %]" href="[% image.post_path %]">
+  <img class="thumbnail img-responsive" src="[% image.src %]"/>
+</a>
+</div>
+[% END %]
+</div>
+</div>
+
+<nav aria-label="Page navigation">
+	<ul class="pager">
+[% IF previous_path %]
+		<li><a href="[% previous_path %]">Previous</a></li>
+[% END %]
+[% IF next_path %]
+		<li><a href="[% next_path %]">Next</a></li>
+[% END %]
+	</ul>
+</nav>
+
+
+<script>
+//init masonry
+var \$grid = \$('.grid').masonry({
+	  // options
+	  itemSelector: '.grid-item',
+	  columnWidth: 210 
+});
+// layout Masonry after each image loads
+\$grid.imagesLoaded().progress( function() {
+  \$grid.masonry('layout');
+});
+</script>
+
+[% END %]

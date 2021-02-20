@@ -1,5 +1,8 @@
 package TweetPics::Utils;
 
+use File::Basename;
+use File::Path qw/make_path/;
+
 use strict;
 use warnings;
 
@@ -36,6 +39,9 @@ sub url_filename
 sub write_to_file
 {
 	my ($filepath, $data) = @_;
+
+	my $dir = dirname($filepath); #lazy directory creation
+	make_path($dir) unless -d $dir;
 
 	open my $fh, ">", $filepath or die "Couldn't open $filepath for writing\n";
 	print $fh $data;

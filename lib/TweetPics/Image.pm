@@ -5,6 +5,7 @@ use warnings;
 
 use TweetPics::Utils;
 use LWP::Simple;
+use Image::Size;
 
 sub new
 {
@@ -50,5 +51,25 @@ sub get_data
 	return $self->{data};
 }
 
+sub is_wide
+{
+	my ($self) = @_;
+
+	if (!$self->{wide_or_tall})
+	{
+		my ($x, $y) = imgsize(\$self->{data});
+		if ($x > $y)
+		{
+			$self->{wide_or_tall} = 'wide';
+		}
+		else
+		{
+			$self->{wide_or_tall} = 'tall';
+		}
+	}
+
+	return 1 if ($self->{wide_or_tall} eq 'wide');
+	return 0;
+}
 
 1;

@@ -1,0 +1,19 @@
+[% WRAPPER page.tt %]
+
+<div class="container">
+  <div class="row">
+    <div class='panel panel-primary' style="width: 40%"><div class='panel-body'>
+      [% post.message %]
+    </div></div>
+
+
+[% FOREACH image_path IN image_paths %]
+
+<img class="thumbnail img-responsive" src="[% image_path %]" />
+
+[% END %]
+
+</div>
+</div>
+
+[% END %]
