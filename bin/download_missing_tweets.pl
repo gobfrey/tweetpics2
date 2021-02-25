@@ -19,5 +19,6 @@ my $persistence = TweetPics::Persistence::LocalDisk->new("$FindBin::Bin/../var/p
 my $source = TweetPics::Source::Twitter->new();
 
 my $updater = TweetPics::Updater->new($source, $persistence);
-$updater->update;
+
+$updater->update_missing_posts;
 

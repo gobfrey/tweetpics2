@@ -15,11 +15,11 @@ use TweetPics::Source::LocalDisk;
 my $persistence = TweetPics::Persistence::Website->new("$FindBin::Bin/../../www/new_version", '/new_version/');
 my $source = TweetPics::Source::LocalDisk->new("$FindBin::Bin/../var/persistence");
 my $updater = TweetPics::Updater->new($source, $persistence);
-$updater->update;
+$updater->update_missing_posts;
 
 
 $persistence = TweetPics::Persistence::WebsiteIndexes->new("$FindBin::Bin/../../www/new_version", '/new_version/');
 $source = TweetPics::Source::LocalDisk->new("$FindBin::Bin/../var/persistence");
 $updater = TweetPics::Updater->new($source, $persistence);
-$updater->update;
+$updater->update_all_posts;
 

@@ -26,8 +26,7 @@ sub new
 	$base_web_path .= '/' unless ($base_web_path =~ m#/$#);
 
 	my $tt = Template->new({
-			#		INCLUDE_PATH => "$FindBin::Bin/../../../../templates",
-		INCLUDE_PATH => '/home/adamfiel/adamfield.net/tweetpics/new_version/templates',
+		INCLUDE_PATH => "$FindBin::Bin/../templates",
 		INTERPOLATE => 1
 	}) or die "$Template::ERROR\n";
 
@@ -35,7 +34,7 @@ sub new
 		base_path => $path,
 		base_web_path => $base_web_path,
 		renderer => $tt,
-		images_per_index => 20,
+		images_per_index => 30,
 		index_number => 1,
 		current_images => []
 	}, $class;
@@ -79,6 +78,8 @@ sub write_post
 {
 	my ($self, $post) = @_;
 
+	return unless $self->post_exists($post); #don't index unless the post has a page
+
 	#write the last page and move onto the next
 	if (scalar @{$self->{current_images}} >= $self->{images_per_index})
 	{
@@ -97,7 +98,12 @@ sub write_post
 
 sub post_exists
 {
-	return 0; #always rebuild all indexes
+	my ($self, $post) = @_;
+
+	my $path = $self->_post_file_path($post);
+
+	return 1 if -e $path;
+	return 0;
 }
 
 sub _current_index_filename
@@ -154,6 +160,23 @@ sub _post_images_data
 	return $paths;
 }
 
+sub _post_file_path
+{
+	my ($self, $post) = @_;
+
+	return $self->_post_base_path($post) . 'index.html';
+}
+
+sub _post_base_path
+{
+	my ($self, $post) = @_;
+
+	my $path = $self->{base_path};
+	$path .= $post->get_source_name . '/';
+	$path .= $post->get_source_id . '/';
+
+	return $path;
+}
 
 sub _image_web_path
 {
@@ -165,7 +188,12 @@ sub _image_web_path
 sub _post_web_path
 {
 	my ($self, $post) = @_;
-	my $path = $self->{base_web_path} . $post->get_source_name . '/' . $post->get_source_id . '/';
+
+	my $path = $self->{base_web_path};
+	$path .= $post->get_source_name . '/';
+	$path .= $post->get_source_id . '/';
+
+	return $path;
 }
 
 1;
