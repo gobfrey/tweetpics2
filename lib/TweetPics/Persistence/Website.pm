@@ -26,8 +26,7 @@ sub new
 	$base_web_path .= '/' unless ($base_web_path =~ m#/$#);
 
 	my $tt = Template->new({
-			#		INCLUDE_PATH => "$FindBin::Bin/../../../../templates",
-		INCLUDE_PATH => '/home/adamfiel/adamfield.net/tweetpics/new_version/templates',
+		INCLUDE_PATH => "$FindBin::Bin/../templates",
 		INTERPOLATE => 1
 	}) or die "$Template::ERROR\n";
 
