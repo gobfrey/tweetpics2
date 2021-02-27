@@ -35,17 +35,23 @@ sub next_post
 
 	my $tweet = $self->_next_interesting_tweet();
 
-	return $self->_create_post_from_tweet($tweet);
+	return $self->_create_post_from_tweet($tweet) if $tweet;
+	return undef;
 }
 
 sub _create_post_from_tweet
 {
 	my ($self, $tweet) = @_;
 
+	return undef unless $tweet;
+
 	my $images = $self->_create_images_from_tweet($tweet);
 
+	my $text = $tweet->{text};
+	$text = $tweet->{full_text} if $tweet->{full_text};
+
 	my $data = {
-		message => $tweet->{text},
+		message => $text,
 		images => $images,
 		datestamp => $tweet->{created_at}, 
 		source_name => 'twitter',
@@ -87,7 +93,10 @@ sub _next_interesting_tweet
 
 		last if !defined $tweet;
 
-		return $tweet if $self->_tweet_is_interesting($tweet);
+		if ($self->_tweet_is_interesting($tweet))
+		{
+			return $tweet;
+		}
 	}
 	return undef;
 }
@@ -117,10 +126,12 @@ sub _tweet_is_interesting
 
 	#not interesting if it doesan't have at least one photo
 	return 0 unless $tweet->{entities}->{media};
+
 	foreach my $media (@{$tweet->{entities}->{media}})
 	{
 		return 1 if $media->{type} eq 'photo';
 	}
+
 	return 0;
 }
 
@@ -133,14 +144,16 @@ sub _load_next_page
 		count => 200,
 		exclude_replies => 'true',
 		include_rts => 'false',
-		trim_user => 'true'
+		trim_user => 'true',
+		tweet_mode => 'extended'
 	};
 
 	$params->{max_id} = $self->{max_id} if $self->{max_id};
+
 	my $statuses = $self->{twitter}->user_timeline($params);
 
 	$self->{tweets} = $statuses;
-	$self->{max_id} = $statuses->[$#{$statuses}]->{id};
+	$self->{max_id} = ($statuses->[$#{$statuses}]->{id} - 1) if scalar @{$statuses};
 }
 
 sub _initialise_twitter
@@ -150,7 +163,7 @@ sub _initialise_twitter
 	my $cfg = TweetPics::Config->new();
 
 	my $client = Twitter::API->new_with_traits(
-		traits              => 'Enchilada',
+		traits              => [ 'Enchilada','RateLimiting' ],
 		consumer_key        => $cfg->value('secrets','twitter','consumer_key'),
 		consumer_secret     => $cfg->value('secrets','twitter','consumer_secret'),
 		access_token        => $cfg->value('secrets','twitter','access_token'),
