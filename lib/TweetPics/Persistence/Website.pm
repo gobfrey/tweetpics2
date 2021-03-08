@@ -37,6 +37,27 @@ sub new
 	}, $class;
 }
 
+sub get_renderer
+{
+	my ($self) = @_;
+
+	return $self->{renderer};
+}
+
+sub get_base_path
+{
+	my ($self) = @_;
+
+	return $self->{base_path};
+}
+
+sub get_base_web_path
+{
+	my ($self) = @_;
+
+	return $self->{base_web_path};
+}
+
 sub write_post
 {
 	my ($self, $post) = @_;
@@ -46,7 +67,7 @@ sub write_post
 	foreach my $image (@{$images})
 	{
 		$self->_write_image($post, $image);
-		push @{$image_paths}, $self->_image_web_path($post, $image);
+		push @{$image_paths}, $self->image_web_path($post, $image);
 	}
 
 	my $data =
@@ -99,14 +120,14 @@ sub _post_base_path
 	return $path;
 }
 
-sub _image_web_path
+sub image_web_path
 {
 	my ($self, $post, $image) = @_;
 
-	return $self->_post_web_path($post) . $image->get_filename;
+	return $self->post_web_path($post) . $image->get_filename;
 }
 
-sub _post_web_path
+sub post_web_path
 {
 	my ($self, $post) = @_;
 	my $path = $self->{base_web_path} . $post->get_source_name . '/' . $post->get_source_id . '/';

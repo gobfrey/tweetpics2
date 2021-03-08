@@ -14,26 +14,15 @@ use JSON;
 
 sub new
 {
-	my ($class, $path, $base_web_path) = @_;
+	my ($class, $website_persistence) = @_;
 
-	die "No base path in Persistence::Website\n" unless
-		$path && -d $path;
-
-	#ensure there's a trailing slash
-	$path .= '/' unless ($path =~ m#/$#);
-
-	$base_web_path = '/' unless $base_web_path;
-	$base_web_path .= '/' unless ($base_web_path =~ m#/$#);
-
-	my $tt = Template->new({
-		INCLUDE_PATH => "$FindBin::Bin/../templates",
-		INTERPOLATE => 1
-	}) or die "$Template::ERROR\n";
+	die "No website persistence in Persistence::WebsiteIndexes\n" unless $website_persistence;
 
 	return bless {
-		base_path => $path,
-		base_web_path => $base_web_path,
-		renderer => $tt,
+		website => $website_persistence,
+		base_path => $website_persistence->get_base_path,
+		base_web_path => $website_persistence->get_base_web_path,
+		renderer => $website_persistence->get_renderer,
 		images_per_index => 30,
 		index_number => 1,
 		current_images => []
@@ -72,13 +61,11 @@ sub _build_index
 
 }
 
-
-
 sub write_post
 {
 	my ($self, $post) = @_;
 
-	return unless $self->post_exists($post); #don't index unless the post has a page
+	return unless $self->_post_page_exists($post); #don't index unless the post has a page
 
 	#write the last page and move onto the next
 	if (scalar @{$self->{current_images}} >= $self->{images_per_index})
@@ -96,14 +83,18 @@ sub write_post
 	$self->_build_index(0);
 }
 
+sub _post_page_exists
+{
+	my ($self, $post) = @_;
+
+	return $self->{website}->post_exists($post);
+}
+
 sub post_exists
 {
 	my ($self, $post) = @_;
 
-	my $path = $self->_post_file_path($post);
-
-	return 1 if -e $path;
-	return 0;
+	return 0; #posts never "exist" in indexes, because it's always a complete rewrite
 }
 
 sub _current_index_filename
@@ -150,9 +141,9 @@ sub _post_images_data
 	foreach my $image (@{$images})
 	{
 		push @{$paths}, {
-			src => $self->_image_web_path($post,$image),
+			src => $self->{website}->image_web_path($post,$image),
 			is_wide => ($image->is_wide ? 1 : 0),
-			post_path => $self->_post_web_path($post),
+			post_path => $self->{website}->post_web_path($post),
 			post_message => $post->get_message
 		};
 	}
@@ -160,40 +151,5 @@ sub _post_images_data
 	return $paths;
 }
 
-sub _post_file_path
-{
-	my ($self, $post) = @_;
-
-	return $self->_post_base_path($post) . 'index.html';
-}
-
-sub _post_base_path
-{
-	my ($self, $post) = @_;
-
-	my $path = $self->{base_path};
-	$path .= $post->get_source_name . '/';
-	$path .= $post->get_source_id . '/';
-
-	return $path;
-}
-
-sub _image_web_path
-{
-	my ($self, $post, $image) = @_;
-
-	return $self->_post_web_path($post) . $image->get_filename;
-}
-
-sub _post_web_path
-{
-	my ($self, $post) = @_;
-
-	my $path = $self->{base_web_path};
-	$path .= $post->get_source_name . '/';
-	$path .= $post->get_source_id . '/';
-
-	return $path;
-}
 
 1;
