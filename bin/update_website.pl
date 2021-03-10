@@ -14,11 +14,12 @@ use TweetPics::Source::LocalDisk;
 
 my $page_persistence = TweetPics::Persistence::WebsitePages->new("$FindBin::Bin/../www/", '/');
 my $index_persistence = TweetPics::Persistence::WebsiteIndexes->new($page_persistence);
-my $source = TweetPics::Source::LocalDisk->new("$FindBin::Bin/../var/persistence");
 
+my $source = TweetPics::Source::LocalDisk->new("$FindBin::Bin/../var/persistence");
 my $updater = TweetPics::Updater->new($source, $page_persistence);
 $updater->update_missing_posts;
 
+$source = TweetPics::Source::LocalDisk->new("$FindBin::Bin/../var/persistence");
 $updater = TweetPics::Updater->new($source, $index_persistence);
 $updater->update_all_posts;
 
