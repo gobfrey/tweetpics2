@@ -22,7 +22,8 @@ eval {$content = TweetPics::Utils::download_from_url($bad_url);};
 like($@,qr/^Couldn't download.*/,'bad URL causes exception');
 
 my $dirs = TweetPics::Utils::directories_in_directory("$FindBin::Bin/../");
-is_deeply($dirs, ['www','bin','lib','var','tests'], 'directories_in_directories');
+
+is_deeply([sort @{$dirs}], [sort('www','bin','lib','var','tests','templates')], 'directories_in_directories');
 
 
 
