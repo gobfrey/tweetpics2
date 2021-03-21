@@ -1,0 +1,30 @@
+============
+Dependencies
+============
+
+The following Perl libraries are required.
+
+ *  Config::IniFiles
+ *  File::Basename
+ *  File::Path
+ *  Image::Size
+ *  JSON
+ *  LWP::Simple
+ *  Template
+ *  Twitter::API
+ *  URI
+
+============
+Installation
+============
+
+Unpack / clone / place project files in a directory, and create a 'www' directory.  This should be visible to your webserver.  Configure your webserver to serve this directory.
+
+Create a secrets.ini file in the project directory, copying the structure of the secrets.ini.example file.
+
+Run the download_new_tweets.pl script in the bin directory to download new tweets from Twitter.
+
+Run the update_website.pl script in the bin directory to generate the website.
+
+The website should now be being served.  Add the download_new_tweets.pl and update_website.pl scripts to the crontab to run periodically.
+
