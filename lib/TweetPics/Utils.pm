@@ -10,18 +10,38 @@ use warnings;
 sub download_from_url
 {
 	my ($url) = @_;
-	use LWP::Simple;
 
-	foreach (1..3)
+	use LWP::UserAgent;
+	use open qw(:std :utf8);
+
+	my $retries = 5;
+
+	while ($retries)
 	{
-		my $image_data = get($url);
-		return $image_data if $image_data;
-		sleep(5); #wait and retry
+		$retries--;	
+		my $ua = LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
+		$ua->agent('TweetPics');
+		my $response = $ua->get($url);
+
+		if ( $response->is_success ) {
+		    return $response->decoded_content;
+		}
 	}
 
 	die "Couldn't download $url\n";
 }
 
+sub json_at_url
+{
+	my ($url) = @_;
+
+	use JSON qw/decode_json/;
+
+	my $content = TweetPics::Utils::download_from_url($url);
+	return decode_json($content) if $content;
+	return undef;
+
+}
 
 #returns the filename part of a URL
 sub url_filename

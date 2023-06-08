@@ -69,12 +69,19 @@ sub _post_base_path
 	my ($self, $post) = @_;
 
 	my $path = $self->{base_path};
-	$path .= $post->get_source_name . '/';
-	$path .= $post->get_source_id . '/';
+	$path .= $self->_escape_filename($post->get_source_name) . '/';
+	$path .= $self->_escape_filename($post->get_source_id) . '/';
 
 	return $path;
 }
 
+sub _escape_filename
+{
+	my ($self, $string) = @_;
+
+	$string =~ s{[/\0]}{_}g;
+	return $string;
+}
 
 sub _write_image
 {
