@@ -17,7 +17,7 @@ sub new
 	my ($class) = @_;
 
 	my $self = bless {
-		next_page_url => 'https://mastodonapp.uk/users/gobfrey/outbox?page=true',
+		next_page_url => 'https://mastodonapp.uk/api/v1/accounts/109839538378208155/statuses',
 		toots => [],
 	}, $class;
 
@@ -53,10 +53,12 @@ sub _create_post_from_toot
 	my $data = {
 		message => $plain_text,
 		images => $images,
-		datestamp => $toot->{published}, 
+		datestamp => $toot->{created_at}, 
 		source_name => 'mastadonapp.uk',
 		source_id => $id
 	};
+
+	print "Create: \n";
 
 	my $post = TweetPics::Post->new($data);
 
@@ -69,12 +71,12 @@ sub _create_images_from_toot
 
 	my $images = [];
 	if (
-		$toot->{attachment}
+		$toot->{media_attachments}
 	)
 	{
-		foreach my $image (@{$toot->{attachment}})
+		foreach my $image (@{$toot->{media_attachments}})
 		{
-			next unless $image->{mediaType} =~ m#^image/#;
+			next unless $image->{type} eq 'image';
 			push @{$images}, TweetPics::Image->new_from_url($image->{url});
 		}
 	}
@@ -86,16 +88,21 @@ sub _next_interesting_toot
 {
 	my ($self) = @_;
 
+	print STDERR "MAIN LOOP\n";
 	while (1)
 	{
+		print STDERR "Getting next toot\n";
 		my $toot = $self->_next_toot;
 
 		last if !defined $toot;
 
+		print STDERR "Checking if it's interesting:";
 		if ($self->_toot_is_interesting($toot))
 		{
+			print STDERR " IS\n";
 			return $toot;
 		}
+		print STDERR " NOT\n";
 	}
 	return undef;
 }
@@ -109,23 +116,27 @@ sub _next_toot
 		$self->_load_next_page;
 	}
 
+	print STDERR "ARE THERE TOOTS?";
+
 	return undef unless scalar @{$self->{toots}};
 
 	my $toot = shift @{$self->{toots}};
 
-	return $toot->{object};
+	return $toot;
 }
 
 sub _toot_is_interesting
 {
 	my ($self, $toot) = @_;
 
-	#not interesting if it doesan't have at least one photo
-	return 0 unless $toot->{attachment};
+	print STDERR "Checking " . $toot->{id} . "\n";	
 
-	foreach my $attachment (@{$toot->{attachment}})
+	#not interesting if it doesan't have at least one photo
+	return 0 unless $toot->{media_attachments};
+
+	foreach my $attachment (@{$toot->{media_attachments}})
 	{
-		return 1 if $attachment->{mediaType} =~ m#^image/#;
+		return 1 if $attachment->{type} eq 'image';
 	}
 
 	return 0;
@@ -141,8 +152,9 @@ sub _load_next_page
 	my $page = TweetPics::Utils::json_at_url($url);
 	return unless $page;
 
-	$self->{toots} = $page->{orderedItems};
-	$self->{next_page_url} = $page->{next}; #untested -- I've only just started on mastadon. Only one page of content.
+	$self->{toots} = $page;
+	$self->{next_page_url} = undef;
+	#$self->{next_page_url} = $page->{next}; #untested -- I've only just started on mastadon. Only one page of content.
 }
 
 
