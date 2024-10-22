@@ -58,7 +58,7 @@ sub _create_post_from_toot
 		source_id => $id
 	};
 
-	print "Create: \n";
+	#print "Create: \n";
 
 	my $post = TweetPics::Post->new($data);
 
@@ -88,21 +88,21 @@ sub _next_interesting_toot
 {
 	my ($self) = @_;
 
-	print STDERR "MAIN LOOP\n";
+	#print STDERR "MAIN LOOP\n";
 	while (1)
 	{
-		print STDERR "Getting next toot\n";
+		#print STDERR "Getting next toot\n";
 		my $toot = $self->_next_toot;
 
 		last if !defined $toot;
 
-		print STDERR "Checking if it's interesting:";
+		#print STDERR "Checking if it's interesting:";
 		if ($self->_toot_is_interesting($toot))
 		{
-			print STDERR " IS\n";
+			#print STDERR " IS\n";
 			return $toot;
 		}
-		print STDERR " NOT\n";
+		#print STDERR " NOT\n";
 	}
 	return undef;
 }
@@ -116,7 +116,7 @@ sub _next_toot
 		$self->_load_next_page;
 	}
 
-	print STDERR "ARE THERE TOOTS?";
+	#print STDERR "ARE THERE TOOTS?";
 
 	return undef unless scalar @{$self->{toots}};
 
@@ -129,7 +129,7 @@ sub _toot_is_interesting
 {
 	my ($self, $toot) = @_;
 
-	print STDERR "Checking " . $toot->{id} . "\n";	
+	#print STDERR "Checking " . $toot->{id} . "\n";	
 
 	#not interesting if it doesan't have at least one photo
 	return 0 unless $toot->{media_attachments};
