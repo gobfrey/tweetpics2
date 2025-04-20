@@ -63,7 +63,7 @@ sub write_to_file
 	my $dir = dirname($filepath); #lazy directory creation
 	make_path($dir) unless -d $dir;
 
-	open my $fh, ">", $filepath or die "Couldn't open $filepath for writing\n";
+	open my $fh, ">:encoding(UTF-8)", $filepath or die "Couldn't open $filepath for writing\n";
 	print $fh $data;
 	close $fh;
 }
