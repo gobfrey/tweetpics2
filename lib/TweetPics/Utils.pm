@@ -6,6 +6,7 @@ use File::Path qw/make_path/;
 use strict;
 use warnings;
 
+
 #returns the data that is available at a URL
 sub download_from_url
 {
@@ -13,6 +14,8 @@ sub download_from_url
 
 	use LWP::UserAgent;
 	use open qw(:std :utf8);
+
+	print STDERR "getting $url\n";
 
 	my $retries = 5;
 
@@ -63,7 +66,7 @@ sub write_to_file
 	my $dir = dirname($filepath); #lazy directory creation
 	make_path($dir) unless -d $dir;
 
-	open my $fh, ">:encoding(UTF-8)", $filepath or die "Couldn't open $filepath for writing\n";
+	open my $fh, ">", $filepath or die "Couldn't open $filepath for writing\n";
 	print $fh $data;
 	close $fh;
 }
